@@ -13,7 +13,7 @@ Alternatively, you may clone this repository.
 
 The Database.cs file contains all the properties and methods to access the database. 
 
-These are the 3 basic methods to interact with the database:
+These are the 3 fundamental methods to interact with the database:
 
 ```csharp
 // Executes a SQL statement against the connection and returns the number of rows affected.
@@ -24,6 +24,62 @@ public static object ExecuteScalar (string sql)
 
 // Executes the query, and returns the entire DataTable.
 public static DataTable ExecuteReader (string sql)
+```
+
+### Querying a table
+
+Assume the following table `Scores` in the database:
+
+| id | name  | score |
+|----|---------|-----|
+| 1  | gaurang | 52  |  
+| 2  | avinash | 54  |  
+| 3  | nikhil  | 53  |  
+
+```csharp
+var dataTable = June.BasicDB.Database.ExecuteQuery("SELECT * FROM Scores");
+
+var row = dataTable[2];		// This gets the DataRow object
+var name1 = row["name"];	// name will contain "nikhil"
+
+// These statements get the values in the cells directly
+var score1Col = dataTable[0]["score"];	// score1Col will contain 52
+var score1Idx = dataTable[0][2];		// score1Idx will contain 52
+var name2Col = dataTable[1]["name"];	// name2 will contain "avinash"
+var name2Idx = dataTable[1][1];		// name2Idx will contain "avinash"
+```
+The DataTable object will allow access to the DataRow using the indexer,
+Values from the DataRow object can then be fetched by using a column number or the column name as seen from the examples above.
+
+
+
+#### Advanced Querying
+
+You can also use a generalized form of the ExecuteQuery method which can return objects in your specified format.
+
+```csharp
+
+class PlayerScore : BaseModel {
+	public int Id { get { return GetInt("id"); } }
+	
+	public string Name { get { return GetString("name"); } }
+	
+	public int Score { get { return GetInt("score"); } }
+	
+	public PlayerScore(IDictionary<string, object> doc) : base(doc) { }
+		
+	public static List<PlayerScore> GetPlayerScoresFromDataTable(DataTable table) {
+		List<PlayerScore> scores = new List<PlayerScore>();
+		for(int row=0; row<table.Rows.Count; row++) {
+			scores.Add(new PlayerScore(table[row]));		}
+		return scores;	}}
+
+
+var scores = June.BasicDB.Database.ExecuteQuery<List<PlayerScore>>(
+				sql: "SELECT * FROM Scores",
+				handler: PlayerScore.GetPlayerScoresFromDataTable);
+
+
 ```
 
 
