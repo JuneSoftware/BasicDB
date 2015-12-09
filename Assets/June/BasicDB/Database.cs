@@ -13,7 +13,7 @@ namespace June.BasicDB {
 	/// <summary>
 	/// Database interface.
 	/// </summary>
-	public static class Database {
+	public static partial class Database {
 		
 		#region Settings Table
 		/// <summary>

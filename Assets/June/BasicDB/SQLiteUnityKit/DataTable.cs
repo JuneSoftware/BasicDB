@@ -8,7 +8,7 @@ namespace SQLiteUnityKit {
 	/// <summary>
 	/// DataRow Class, this object can be accessed via two indexers i.e. ColumnName and ColumnNumber.
 	/// </summary>
-	public class DataRow : IDictionary<int, object>, IDictionary<string, object>, IDisposable {
+	public partial class DataRow : IDictionary<int, object>, IDictionary<string, object>, IDisposable {
 		List<string> _Columns = null;
 		Dictionary<int, object> _Row;
 
@@ -283,7 +283,7 @@ namespace SQLiteUnityKit {
 	/// <summary>
 	/// Data table.
 	/// </summary>
-	public class DataTable : IDisposable {
+	public partial class DataTable : IDisposable {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SQLiteUnityKit.DataTable"/> class.
