@@ -40,7 +40,7 @@ In the above image we can see there are 3 sections in the Database Window
 ![Editor Database Tab](https://raw.githubusercontent.com/JuneSoftware/BasicDB/master/screenshots/2DatabaseTab.png)
   
 - **Settings**
-  : The Settings tab allows the user to create/update/remove keys from the settings table in the database.
+  : The Settings tab allows the user to Create/Update values in the settings table from the database.
 
 
 ![Editor Settings Tab](https://raw.githubusercontent.com/JuneSoftware/BasicDB/master/screenshots/3SettingsTab.png)
@@ -127,13 +127,13 @@ static readonly string DB_VERSION_SETTING_KEY = "DB_VER";
 // The latest schema version which this application expects
 static readonly float DB_VERSION_LATEST = 2.0f;
 ```
-**DB_VERSIONS : **
+**DB_VERSIONS :**
 This contains a list of key-pairs of _( Version No & Resource Name )_, the resource name is the name of the file present in the [Resources] (https://github.com/JuneSoftware/BasicDB/tree/master/Assets/Resources) folder containing the corresponding migration script
 
-**DB_VERSION_SETTING_KEY : **
+**DB_VERSION_SETTING_KEY :**
 This is the key used to store the current schema version in the settings table in the database
 
-**DB_VERSION_LATEST : **
+**DB_VERSION_LATEST :**
 If the current schema version in the settings table is lesser than this then the migration system will execute the migration scripts till it reaches this value
 
 If the above values have be specified, the developer only needs to call `June.BasicDB.Database.MigrateSchemaToLatest ()` when the app starts to check and migrate the current database to the latest schema.
@@ -218,25 +218,3 @@ var scores = June.BasicDB.Database.ExecuteQuery<List<PlayerScore>>(
 				sql: "SELECT * FROM Scores",
 				handler: PlayerScore.GetPlayerScoresFromDataTable);
 ```
-
-
-Here are the properties that can be modified:
-
-```csharp
-// Database file name
-public static string FILE_NAME = "BasicDB.db";
-
-// Database file path
-internal static readonly string DB_CONNECTION_STRING = Path.Combine(Application.persistentDataPath, FILE_NAME);
-
-// The latest version of the schema
-internal static readonly float DB_VERSION_LATEST = 1.0f;
-
-// The schema versions with their migration scripts
-// The migration script needs to be present in the Resources folder
-internal static List<KeyValuePair<float, string>> DB_VERSIONS = new List<KeyValuePair<float, string>> () { 
-			new KeyValuePair<float, string> (1.0f, "Schema1"),
-			new KeyValuePair<float, string> (2.0f, "Schema2")
-		};
-```
-
