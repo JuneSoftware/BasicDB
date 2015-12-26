@@ -65,7 +65,7 @@ namespace June.BasicDB {
 		#else
 		internal
 		#endif
-		static readonly float DB_VERSION_LATEST = 1.0f;
+		static readonly float DB_VERSION_LATEST = 2.0f;
 
 		/// <summary>
 		/// Database filename

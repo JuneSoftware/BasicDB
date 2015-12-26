@@ -1,5 +1,7 @@
 -- Schema Version 2.0
 
+ALTER TABLE players ADD COLUMN level INTEGER NOT NULL DEFAULT 1;
+
 INSERT INTO players(id, name) VALUES(3, 'Player3');
 
 INSERT INTO items(id, name) VALUES(6, 'Item6');
