@@ -138,7 +138,7 @@ If the current schema version in the settings table is lesser than this then the
 
 If the above values have be specified, the developer only needs to call `June.BasicDB.Database.MigrateSchemaToLatest ()` when the app starts to check and migrate the current database to the latest schema.
 
-Here are a few examples of the migration scripts:
+#### Migration Scripts
 
 This first schema version defines the basic table structure for the current game
 
