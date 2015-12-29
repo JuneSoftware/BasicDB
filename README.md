@@ -11,7 +11,35 @@ Alternatively, you may clone this repository.
 
 ## Usage
 
-The Database.cs file contains all the properties and methods to access the database. 
+### Querying a table
+
+Assume the following table `Scores` in the database:
+
+| id | name  | score |
+|----|---------|-----|
+| 1  | gaurang | 52  |  
+| 2  | avinash | 54  |  
+| 3  | nikhil  | 53  |  
+
+```csharp
+// This executes the SQL query and gets a DataTable object as a result
+var dataTable = June.BasicDB.Database.ExecuteQuery("SELECT * FROM Scores");
+
+var row = dataTable[2];		// This gets the DataRow object
+var name1 = row["name"];	// name will contain "nikhil"
+
+// These statements get the values in the cells directly
+var score1Col = dataTable[0]["score"];	// score1Col will contain 52
+var score1Idx = dataTable[0][2];		// score1Idx will contain 52
+var name2Col = dataTable[1]["name"];	// name2 will contain "avinash"
+var name2Idx = dataTable[1][1];		// name2Idx will contain "avinash"
+```
+The DataTable object will allow access to the DataRow using the indexer,
+Values from the DataRow object can then be fetched by using a column number or the column name as seen from the examples above.
+
+### Features
+
+The `Database.cs` file contains all the properties and methods to access the database.
 
 These are the 3 fundamental methods to interact with the database:
 
@@ -50,31 +78,6 @@ In the above image we can see there are 3 sections in the Database Window
 
 ![Editor Migrations Tab](https://raw.githubusercontent.com/JuneSoftware/BasicDB/master/screenshots/4MigrationsTab.png)
 
-
-### Querying a table
-
-Assume the following table `Scores` in the database:
-
-| id | name  | score |
-|----|---------|-----|
-| 1  | gaurang | 52  |  
-| 2  | avinash | 54  |  
-| 3  | nikhil  | 53  |  
-
-```csharp
-var dataTable = June.BasicDB.Database.ExecuteQuery("SELECT * FROM Scores");
-
-var row = dataTable[2];		// This gets the DataRow object
-var name1 = row["name"];	// name will contain "nikhil"
-
-// These statements get the values in the cells directly
-var score1Col = dataTable[0]["score"];	// score1Col will contain 52
-var score1Idx = dataTable[0][2];		// score1Idx will contain 52
-var name2Col = dataTable[1]["name"];	// name2 will contain "avinash"
-var name2Idx = dataTable[1][1];		// name2Idx will contain "avinash"
-```
-The DataTable object will allow access to the DataRow using the indexer,
-Values from the DataRow object can then be fetched by using a column number or the column name as seen from the examples above.
 
 ### Settings
 
@@ -193,9 +196,9 @@ public static float GetNextSchemaVersion (float currentVersion)
 
 ## Advanced Querying
 
-** TODO: NEED TO ADD LINKS TO June.Core & EXPLAIN BaseModel **
+You will need to read up on the [June.Core](https://github.com/JuneSoftware/JuneCore) framework to understand BaseModel's.
 
-You can also use a generalized form of the ExecuteQuery method which can return objects in your specified type.
+The query below shows a generalised form of the ExecuteQuery method which can return objects in the specified type.
 
 ```csharp
 class PlayerScore : BaseModel {
@@ -210,11 +213,58 @@ class PlayerScore : BaseModel {
 	public static List<PlayerScore> GetPlayerScoresFromDataTable(DataTable table) {
 		List<PlayerScore> scores = new List<PlayerScore>();
 		for(int row=0; row<table.Rows.Count; row++) {
+			// Here we can send the DataRow object directly to the constructor as it implements the IDictionary<string, object> interface
 			scores.Add(new PlayerScore(table[row]));		}
 		return scores;	}}
 
 
+// This method call will return a list of player score objects
 var scores = June.BasicDB.Database.ExecuteQuery<List<PlayerScore>>(
 				sql: "SELECT * FROM Scores",
 				handler: PlayerScore.GetPlayerScoresFromDataTable);
 ```
+
+This is possible because the DataRow object also implements the `IDictionary<string, object>` interface which allows it to be consumed by our `BaseModel` directly without any conversion/casting.
+
+Lets take a look under the hood at our data objects
+
+```csharp
+// The DataTable class encapsulates the DataRow objects
+public partial class DataTable : IDisposable {
+
+	public List<string> Columns { get; set; }
+	
+	public List<DataRow> Rows { get; set; }
+	
+	public DataRow this[int index] { get; }
+
+	...
+}
+
+// The DataRow object implements two interfaces of IDictionary,
+// the IDictionary<int, object> and IDictionary<string, object>
+public partial class DataRow : IDictionary<int, object>, IDictionary<string, object>, IDisposable {
+
+	// IDictionary implementation
+	
+	// ICollection implementation
+	
+	// IEnumerable implementation
+	
+	// IDictionary<int, object> implementation
+	
+	// IDictionary<string, object> implementation
+	
+	...
+
+	// Fetches cell value from the specified column number
+	public object this [int columnNumber] { get; }
+	
+	// Fetches cell value from the specified column name
+	public object this [string columnName] { get; }	
+	// Fetches all the cell values in the row
+	public object[] Data { get; }
+}
+```
+
+You will notice that the `DataTable` and `DataRow` classes implement the `IDisposable` interface this allows our query methods to use these objects efficiently and they dispose of them as soon as they have completed their execution.
